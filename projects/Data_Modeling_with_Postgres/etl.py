@@ -33,8 +33,9 @@ def process_log_file(cur, filepath):
     """
     # open log file
     df = pd.read_json(filepath, lines=True)
-    df["userId"].replace({'': '0'}, inplace=True)
-    df['userId'].astype(int)
+    if df.dtypes['userId'] != int:
+        df["userId"].replace({'': '0'}, inplace=True)
+        df['userId'] = df['userId'].astype(int)
 
     # filter by NextSong action
     df['timestamp'] = pd.to_datetime(df['ts'], unit='ms')
