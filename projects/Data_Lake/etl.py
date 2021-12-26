@@ -55,7 +55,7 @@ def process_song_data(spark, input_data, output_data):
 
     # extract columns to create artists table
     artists_cols = ["artist_id", "artist_name as name", "artist_location as location", "artist_latitude as latitude", "artist_longitude as longitude"]
-    artists_table = df.selectExpr(artists_fields).dropDuplicates()
+    artists_table = df.selectExpr(artists_cols).dropDuplicates()
     
     # write artists table to parquet files
     artists_table.write.mode("overwrite").parquet(output_data + 'artists')
@@ -76,8 +76,8 @@ def process_log_data(spark, input_data, output_data):
     df = df.filter(df.page == 'NextSong')
 
     # extract columns for users table    
-    users_col = ["userId as user_id", "firstName as first_name", "lastName as last_name", "gender", "level"]
-    users_table = df.selectExpr(users_col).dropDuplicates()
+    users_cols = ["userId as user_id", "firstName as first_name", "lastName as last_name", "gender", "level"]
+    users_table = df.selectExpr(users_cols).dropDuplicates()
     
     # write users table to parquet files
     users_table.write.mode("overwrite").parquet(output_data + 'users')
