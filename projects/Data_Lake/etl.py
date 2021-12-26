@@ -39,6 +39,7 @@ def process_song_data(spark, input_data, output_data):
         StructField("artist_name", StringType()),
         StructField("duration", DoubleType()),
         StructField("num_songs", IntegerType()),
+        StructField("song_id", StringType()),
         StructField("title", StringType()),
         StructField("year", IntegerType()),
     ])
@@ -47,15 +48,15 @@ def process_song_data(spark, input_data, output_data):
     df = spark.read.json(song_data, schema=song_schema)
 
     # extract columns to create songs table
-    song_cols = ["title", "artist_id", "year", "duration"]
-    songs_table = df.select(song_cols).dropDuplicates().withColumn("song_id", monotonically_increasing_id())
+    song_cols = ["song_id", "title", "artist_id", "year", "duration"]
+    songs_table = df.select(song_cols).dropDuplicates(["song_id"])
     
     # write songs table to parquet files partitioned by year and artist
     songs_table.write.mode("overwrite").partitionBy("year", "artist_id").parquet(output_data + "songs")
 
     # extract columns to create artists table
     artists_cols = ["artist_id", "artist_name as name", "artist_location as location", "artist_latitude as latitude", "artist_longitude as longitude"]
-    artists_table = df.selectExpr(artists_cols).dropDuplicates()
+    artists_table = df.selectExpr(artists_cols).dropDuplicates(["artist_id"])
     
     # write artists table to parquet files
     artists_table.write.mode("overwrite").parquet(output_data + 'artists')
@@ -77,7 +78,7 @@ def process_log_data(spark, input_data, output_data):
 
     # extract columns for users table    
     users_cols = ["userId as user_id", "firstName as first_name", "lastName as last_name", "gender", "level"]
-    users_table = df.selectExpr(users_cols).dropDuplicates()
+    users_table = df.selectExpr(users_cols).dropDuplicates(["userId"])
     
     # write users table to parquet files
     users_table.write.mode("overwrite").parquet(output_data + 'users')
@@ -99,7 +100,7 @@ def process_log_data(spark, input_data, output_data):
         .withColumn("weekday", hour("start_time")) \
     
     # extract columns to create time table
-    time_table = df.select("start_time", "hour", "day", "week", "month", "year", "weekday")
+    time_table = df.select("start_time", "hour", "day", "week", "month", "year", "weekday").dropDuplicates(["start_time"])
     
     # write time table to parquet files partitioned by year and month
     time_table.write.mode("overwrite").partitionBy("year", "month").parquet(output_data + "time")
