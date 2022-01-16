@@ -92,8 +92,15 @@ load_time_dimension_table = LoadDimensionOperator(
     truncate=True
 )
 
+dq_checks = [{'table': 'songplays', 'min': 1, 'max': None},
+                {'table': 'artists', 'min': 1, 'max': None},
+                {'table': 'songs', 'min': 1, 'max': None},
+                {'table': 'time', 'min': 1, 'max': None},
+                {'table': 'users', 'min': 1, 'max': None}]
+
 run_quality_checks = DataQualityOperator(
     task_id='Run_data_quality_checks',
+    dq_checks = dq_checks,
     dag=dag
 )
 

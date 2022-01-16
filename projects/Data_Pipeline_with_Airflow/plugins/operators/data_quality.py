@@ -9,19 +9,30 @@ class DataQualityOperator(BaseOperator):
     @apply_defaults
     def __init__(self,
                  conn_id,
-                 tables,
+                 dq_checks=[]
                  *args, **kwargs):
 
         super(DataQualityOperator, self).__init__(*args, **kwargs)
         self.conn_id = redshift_conn_id
-        self.tables = tables
+        self.dq_checks = dq_checks
 
     def execute(self, context):
         redshift_hook = PostgresHook(self.conn_id)
-        for table in self.tables:
+
+        for item in self.dq_checks:
+            table = item.get('table', None)
+            min_count = item.get('min', None)
+            max_count = item.get('max', None)
+
+            if table is None:
+                continue
+
             records = redshift_hook.get_records(f"SELECT COUNT(*) FROM {table}")
             if len(records) < 1 or len(records[0]) < 1:
                 raise ValueError(f"Data quality check failed. {table} returned no results")
-            if records[0][0] < 1:
-                raise ValueError(f"Data quality check failed. {table} contained 0 rows")
+            row_count = records[0][0]
+            if min_count is not None and row_count < min_count:
+                raise ValueError(f"Data quality check failed. {table} contained {row_count} rows, less than expected min {min_count}")
+            if max_count is not None and row_count > max_count:
+                raise ValueError(f"Data quality check failed. {table} contained {row_count} rows, more than expected max {max_count}")
             self.log.info(f"Data quality on table {table} check passed with {records[0][0]} records")
