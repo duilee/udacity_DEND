@@ -103,8 +103,8 @@ List the steps necessary to pipeline the data into the chosen data model
 
 ## Complete Project Write Up
 ##### Who is going to use the data model
-Anyone interested in immigration data or those who needs immigration data in regular basis should be the core audience  
-i.e. government officials in immigration, data analysts working at NGO,... etc
+- Anyone interested in immigration data or those who needs immigration data in regular basis should be the core audience  
+- i.e. government officials in immigration, data analysts working at NGO,... etc
 
 ##### What are the types of questions that can be answered
 - location specific statstics including airports, city
