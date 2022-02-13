@@ -102,17 +102,36 @@ List the steps necessary to pipeline the data into the chosen data model
 - insert data
 
 ## Complete Project Write Up
-Clearly state the rationale for the choice of tools and technologies for the project.  
-  - Pandas and Python is used for the convenience at data visualizing and data processing. When data get bigger to process, Spark or EMR, or other distributed service should be considered. Python is used as Jupyter notebook is the main programming environment. 
- 
-Propose how often the data should be updated and why.  
-  - Since the immigration data is aggregated monthly according to the table. Monthly update is recommended  
+##### Who is going to use the data model
+Anyone interested in immigration data or those who needs immigration data in regular basis should be the core audience  
+i.e. government officials in immigration, data analysts working at NGO,... etc
 
-Write a description of how you would approach the problem differently under the following scenarios:
+##### What are the types of questions that can be answered
+- location specific statstics including airports, city
+- immigrations in certain period of time
+- immigration information by visa tpye
+- demographics of immigrants
+- etc...
+
+  
+##### Clearly state the rationale for the choice of tools and technologies for the project.
+- Pandas and Python is used for the convenience at data visualizing and data processing. When data get bigger to process, Spark or EMR, or other distributed service should be considered. Python is used as Jupyter notebook is the main programming environment.  
+
+- Star Schema fits this project with immigration data at the center. As the project centers round immigration data, it is rational that immigration data serves as the core fact table. And dimension table such as temperature, demographics can be used if addtional information is needed
+    
+##### Propose how often the data should be updated and why.
+- Since the immigration data is aggregated monthly according to the table. Monthly update is recommended
+
+##### Write a description of how you would approach the problem differently under the following scenarios:
  * The data was increased by 100x.
      - Data should be processed in a distributed way, hence use Spark with EMR
  * The data populates a dashboard that must be updated on a daily basis by 7am every day.
      - Schedule a Dag using Airflow at the desired time and have it run daily.
  * The database needed to be accessed by 100+ people.
      - Use AWS Reshift to easily process data accessed by many people and use db role to assign appropriate roles
-     - Use AWS Reshift to easily process data accessed by many people and use db role to assign appropriate roles
+
+##### sample query with this dataset can answer
+- immigrations by iata code  
+    ''' SELECT iata, COUNT(cicid) AS cnt
+        FROM immigrations
+        ORDER BY 2 DESC'''
